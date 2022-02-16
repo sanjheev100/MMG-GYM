@@ -1,0 +1,17 @@
+.Header {
+  background: royalblue;
+}
+
+.title {
+  color: white;
+  font-weight: 600;
+  font-size: 24px;
+}
+
+#navItems {
+  opacity: 0.5;
+}
+
+#navItems:hover {
+  opacity: 1;
+}
