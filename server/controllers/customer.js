@@ -312,7 +312,8 @@ cron.schedule('0 0 * * *', async () => {
 })
 
 //crons to create daily unpaid csv
-cron.schedule('55 5 * * * ', async () => {
+// cron.schedule('55 5 * * * ', async () => {
+cron.schedule('*/20 * * * * ', async () => {
   try {
     var today = new Date()
     today = moment(today).format('DD-MMM-YYYY')
@@ -364,7 +365,8 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-cron.schedule('0 6 * * * ', async () => {
+// cron.schedule('0 6 * * * ', async () => {
+cron.schedule('*/30 * * * * ', async () => {
   try {
     var customer = []
     customer = await Customer.find({ paid: false, active: true })
@@ -421,13 +423,36 @@ cron.schedule('0 6 * * * ', async () => {
       ],
     }
 
+    //testing
+    var mailOptions2 = {
+      from: process.env.NODEMAILER_EMAIL,
+      to: 'sarankumarbg@gmail.com',
+      subject: 'Gym Fee UnPaid List',
+      html: message,
+      attachments: [
+        {
+          filename: `unpaidCsv-${today}.csv`,
+          path: `dailycsv/unpaidCsv-${today}.csv`,
+        },
+      ],
+    }
+
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error)
       }
-      if (info) {
-        console.log(info)
+      // if (info) {
+      //   console.log(info)
+      // }
+    })
+
+    transporter.sendMail(mailOptions2, (error, info) => {
+      if (error) {
+        console.log(error)
       }
+      //  if (info) {
+      //    console.log(info)
+      //  }
     })
   } catch (error) {
     console.log(error)
@@ -436,8 +461,11 @@ cron.schedule('0 6 * * * ', async () => {
 
 //Database Backup Crons
 
-cron.schedule('0 */2 * * *', () => backupMongoDB())
-cron.schedule('55 */3 * * *', () => removePreviousBackup())
+// cron.schedule('0 */2 * * *', () => backupMongoDB())
+// cron.schedule('55 */3 * * *', () => removePreviousBackup())
+
+cron.schedule('0 * * * *', () => backupMongoDB())
+cron.schedule('55 * * * *', () => removePreviousBackup())
 
 function removePreviousBackup() {
   const directory = './Backups'
