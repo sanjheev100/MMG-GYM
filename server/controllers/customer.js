@@ -5,6 +5,9 @@ const shell = require('shelljs')
 const nodemailer = require('nodemailer')
 const moment = require('moment')
 const createCsvWriter = require('csv-writer').createObjectCsvWriter
+const { spawn } = require('child_process')
+const path = require('path')
+const fs = require('fs')
 exports.createCustomer = async (req, res) => {
   const { name, phone, gymId, address, joinDate, active, planName, paid } =
     req.body.values.values
@@ -430,3 +433,55 @@ cron.schedule('0 6 * * * ', async () => {
     console.log(error)
   }
 })
+
+//Database Backup Crons
+
+cron.schedule('0 */2 * * *', () => backupMongoDB())
+cron.schedule('55 */3 * * *', () => removePreviousBackup())
+
+function removePreviousBackup() {
+  const directory = './Backups'
+  fs.readdir(directory, (err, files) => {
+    if (err) throw err
+
+    for (const file of files) {
+      // console.log(file)
+      fs.unlink(path.join(directory, file), (err) => {
+        if (err) throw err
+      })
+    }
+  })
+}
+
+function backupMongoDB() {
+  var time = Date.now()
+  time = moment(time).format('DD--MM--YYYY_HH-mm-ss')
+  console.log(time)
+  const DB_NAME = 'MMG'
+
+  const ARCHIVE_PATH = path.join(
+    __dirname,
+    '../Backups',
+    `${DB_NAME}_${time}.gzip`
+  )
+
+  const child = spawn('mongodump', [
+    `--db=${DB_NAME}`,
+    `--archive=${ARCHIVE_PATH}`,
+    '--gzip',
+  ])
+  child.stdout.on('data', (data) => {
+    console.log('stdout:\n', data.toString())
+  })
+  child.stderr.on('data', (data) => {
+    console.log('stderr:\n', data.toString())
+  })
+  child.on('error', (error) => {
+    console.log('error', error.toString())
+  })
+  child.on('exit', (code, signal) => {
+    if (code) console.log(`Process exit with code ${code}`)
+    else if (signal) console.log(`Process terminated by signal ${signal}`)
+    else console.log('Backup is succesfull')
+  })
+}
