@@ -101,7 +101,7 @@ const AllCustomers = () => {
       if (parseInt(keyWord) == 'NaN') {
         return toast.error('Please Enter Valid Number Without e')
       } else {
-        keyWord = keyWord.toLowerCase()
+        setKeyword(keyWord.toLowerCase())
       }
     }
 
