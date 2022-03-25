@@ -313,7 +313,7 @@ cron.schedule('0 0 * * *', async () => {
 
 //crons to create daily unpaid csv
 cron.schedule('50 5 * * * ', async () => {
-//cron.schedule('*/3 * * * * ', async () => {
+  //cron.schedule('*/3 * * * * ', async () => {
   try {
     var today = new Date()
     today = moment(today).format('DD-MMM-YYYY')
@@ -358,21 +358,21 @@ cron.schedule('50 5 * * * ', async () => {
 
 //cron to send daily unpaid mail
 const transporter = nodemailer.createTransport({
-	host:'smtp.gmail.com',
-	port:587,
-	secure:false,
-	//service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  //service: 'gmail',
   auth: {
     user: process.env.NODEMAILER_EMAIL,
     pass: process.env.NODEMAILER_PASSWORD,
   },
-	tls:{
-	rejectUnauthorized:true
-	}
+  tls: {
+    rejectUnauthorized: true,
+  },
 })
 
 cron.schedule('0 6 * * * ', async () => {
-//cron.schedule('*/5 * * * * ', async () => {
+  //cron.schedule('*/5 * * * * ', async () => {
   try {
     var customer = []
     customer = await Customer.find({ paid: false, active: true })
@@ -429,36 +429,10 @@ cron.schedule('0 6 * * * ', async () => {
       ],
     }
 
-    //testing
-    var mailOptions2 = {
-      from: process.env.NODEMAILER_EMAIL,
-      to: 'sarankumarbg@gmail.com',
-      subject: 'Gym Fee UnPaid List',
-      html: message,
-      attachments: [
-        {
-          filename: `unpaidCsv-${today}.csv`,
-          path: `dailycsv/unpaidCsv-${today}.csv`,
-        },
-      ],
-    }
-
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error)
       }
-      // if (info) {
-      //   console.log(info)
-      // }
-    })
-
-    transporter.sendMail(mailOptions2, (error, info) => {
-      if (error) {
-        console.log(error)
-      }
-      //  if (info) {
-      //    console.log(info)
-      //  }
     })
   } catch (error) {
     console.log(error)
@@ -466,12 +440,7 @@ cron.schedule('0 6 * * * ', async () => {
 })
 
 //Database Backup Crons
-
-//cron.schedule('0 */2 * * *', () => backupMongoDB())
-//cron.schedule('55 */3 * * *', () => removePreviousBackup())
-
 cron.schedule('0 */2 * * *', () => backupMongoDB())
-//cron.schedule('*/30 * * * * *', () => removePreviousBackup())
 
 function removePreviousBackup() {
   const directory = './Backups'
@@ -519,5 +488,3 @@ function backupMongoDB() {
     else console.log('Backup is succesfull')
   })
 }
-
-

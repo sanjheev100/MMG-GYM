@@ -40,6 +40,7 @@ const customerSchema = new mongoose.Schema(
     },
     planName: {
       type: String,
+      default: 'Weight Gain',
     },
   },
   { timestamps: true }
